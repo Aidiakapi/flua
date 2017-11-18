@@ -446,11 +446,11 @@ test('flua:distinct', function ()
 end)
 
 test('flua:memoize', function ()
-    local n = 0
+    local c = 0
     local iter = flua.range(5):map(function (v)
-        n = n + 1
+        c = c + 1
         return v * 2, v * 3, nil, v * 5
-    end, 4):memoize()
+    end, 4)
     local function test()
         local n = 0
         for x1, x2, y1, y2 in iter:iter() do
@@ -463,11 +463,15 @@ test('flua:memoize', function ()
         assert(n == 5, 'invalid length')
     end
     test()
-    assert(n == 5, 'invalid length')
+    assert_equal(5, c)
     test()
-    assert(n == 5, 'invalid length')
+    assert_equal(10, c)
+    iter = iter:memoize()
+    test()
+    assert_equal(15, c)
+    test()
+    assert_equal(15, c)
 end)
-
 test('flua:flatmap:memoize', function ()
     local count_1, count_2 = 0, 0
     local in_iter = flua.range(1, 3)
@@ -477,16 +481,19 @@ test('flua:flatmap:memoize', function ()
         end, 2)
         :flatmap(function (lower, upper)
             count_2 = count_2 + 1
-            return flua.range(lower, upper):zip(flua.range(lower, upper):map(function (x) return x * 2 end))
-        end, 2)
+            return flua.range(lower, upper)
+                :map(function (x) return x, nil end, 2)
+                :zip(flua.range(lower, upper):map(function (x) return x * 2 end))
+        end, 3)
     
     local expected_1 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
     local expected_2 = { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 }
     local function test()
         local received_1, received_2 = {}, {}
-        for i, j in in_iter:iter() do
+        for i, j, k in in_iter:iter() do
             received_1[#received_1 + 1] = i
-            received_2[#received_2 + 1] = j
+            assert_equal(nil, j)
+            received_2[#received_2 + 1] = k
         end
         assert_equal(expected_1, received_1)
     end
