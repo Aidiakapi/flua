@@ -227,10 +227,10 @@ test('flua.from gmatch', function ()
     assert(n == 5, 'invalid length')
 end)
 
-test('flua:list()', function ()
+test('flua:list', function ()
     assert_equal({ 5, 6, 7, 8, 9 }, flua.range(5):map(function (v) return v + 4 end):list(), 'tables not equal')
 end)
-test('flua:table()', function ()
+test('flua:table', function ()
     assert_equal({
         ['1'] = 5,
         ['2'] = 6,
@@ -238,6 +238,53 @@ test('flua:table()', function ()
         ['4'] = 8,
         ['5'] = 9
     }, flua.range(5):map(function (v) return tostring(v), v + 4 end, 2):table(), 'tables not equal')
+end)
+test('flua:group_by(group, value)', function()
+    assert_equal({
+        t1 = { 3, 6, 11 },
+        t2 = { 2, 4, 5, 12 },
+        t3 = { 1, 7, 8, 9, 10 },
+    }, flua.ipairs({
+        { type = 't3', key = 'a' },
+        { type = 't2', key = 'b' },
+        { type = 't1', key = 'c' },
+        { type = 't2', key = 'd' },
+        { type = 't2', key = 'e' },
+        { type = 't1', key = 'f' },
+        { type = 't3', key = 'g' },
+        { type = 't3', key = 'h' },
+        { type = 't3', key = 'i' },
+        { type = 't3', key = 'j' },
+        { type = 't1', key = 'k' },
+        { type = 't2', key = 'l' },
+    }):group_by(
+        function (index, value) return value.type end,
+        function (index, value) return index end
+    ))
+end)
+test('flua:group_by(group, key, value)', function()
+    assert_equal({
+        t1 = { c = 3, f = 6, k = 11 },
+        t2 = { b = 2, d = 4, e = 5, l = 12 },
+        t3 = { a = 1, g = 7, h = 8, i = 9, j = 10 },
+    }, flua.ipairs({
+        { type = 't3', key = 'a' },
+        { type = 't2', key = 'b' },
+        { type = 't1', key = 'c' },
+        { type = 't2', key = 'd' },
+        { type = 't2', key = 'e' },
+        { type = 't1', key = 'f' },
+        { type = 't3', key = 'g' },
+        { type = 't3', key = 'h' },
+        { type = 't3', key = 'i' },
+        { type = 't3', key = 'j' },
+        { type = 't1', key = 'k' },
+        { type = 't2', key = 'l' },
+    }):group_by(
+        function (index, value) return value.type end,
+        function (index, value) return value.key end,
+        function (index, value) return index end
+    ))
 end)
 
 test('flua:map 1d', function ()
