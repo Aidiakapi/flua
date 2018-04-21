@@ -90,7 +90,7 @@
 
     ISC License
 
-    Copyright (c) 2017, Aidiakapi
+    Copyright (c) 2017-2018, Aidiakapi
 
     Permission to use, copy, modify, and/or distribute this software for any
     purpose with or without fee is hereby granted, provided that the above
@@ -110,7 +110,7 @@ local flua, api = {
     _NAME = 'Flua',
     _COPYRIGHT = 'Aidiakapi',
     _DESCRIPTION = 'Functional iterators and adapters.',
-    _VERSION = '0.1.0',
+    _VERSION = '0.1.1',
     _LICENSE = 'ISC'
 }, {}
 local iter_mt = { __index = api }
